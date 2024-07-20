@@ -2,4 +2,6 @@ import scrapy
 
 
 class DatadiggerItem(scrapy.Item):
-    pass
+    title = scrapy.Field()
+    url = scrapy.Field()
+    date = scrapy.Field()

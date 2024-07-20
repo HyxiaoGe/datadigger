@@ -1,6 +1,6 @@
 import scrapy
 
-from items import DatadiggerItem
+from datadigger.items import DatadiggerItem
 
 
 class NineNewsSpider(scrapy.Spider):
@@ -16,4 +16,5 @@ class NineNewsSpider(scrapy.Spider):
             item['title'] = article.css('h3.story__headline span.story__headline__text::text').get()
             item['url'] = article.css('h3.story__headline a::attr(href)').get()
             item['date'] = article.css('time.story__time::text').get()
+            item['imgUrl'] = article.css('figure.story__media img::attr(src)').get()
             yield item

@@ -9,7 +9,7 @@ class NineNewsSpider(scrapy.Spider):
     start_urls = ["https://www.9news.com.au/artificial-intelligence"]
 
     def parse(self, response):
-        articles = response.css('div.feed__stories article.story-block')
+        articles = response.css('div.feed__stories article.py.story-block')
 
         for article in articles:
             item = DatadiggerItem()

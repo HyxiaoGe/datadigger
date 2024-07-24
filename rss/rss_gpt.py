@@ -1,6 +1,7 @@
 import configparser
 import os
 from lxml import etree
+import re
 import requests
 from datetime import datetime, timedelta
 import pytz
@@ -49,6 +50,7 @@ def fetch_xml():
                             content = item.find('content:encoded', namespaces=namespaces).text
                             pub_date = item.find('pubDate').text
                             pub_date = format_date(pub_date)
+                            content = extract_content_between_divs(content)
                             article = Article(title=title, link=link, content=content, publication_date=pub_date)
                             articles.append(article)
                     except etree.XMLSyntaxError as e:
@@ -58,6 +60,14 @@ def fetch_xml():
         return articles
     else:
         print(response.json()['message'])
+
+
+def extract_content_between_divs(content):
+    pattern = re.compile(r'<div>(.*?)<div>', re.DOTALL)
+    match = pattern.search(content)
+    if match:
+        return match.group(1)
+    return "No content found between divs"
 
 
 def format_date(date_str):

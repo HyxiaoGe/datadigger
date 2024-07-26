@@ -20,46 +20,51 @@ repo = config['GitHub']['REPO']
 path = 'docs'
 
 
-def fetch_xml():
+def fetch_xml(platform):
     url = f'https://api.github.com/repos/{owner}/{repo}/contents/{path}'
 
     headers = {'Authorization': f'Bearer {token}'}
     response = requests.get(url=url, headers=headers)
 
-    namespaces = {
-        'content': 'http://purl.org/rss/1.0/modules/content/',
-    }
+    filenames = ['36kr-ai.xml', 'chaping.xml', 'aliresearch.xml']
 
     if response.status_code == 200:
         files = response.json()
-        articles = []
         for file in files:
             filename = file['name']
             url = file['download_url']
             _, file_extension = os.path.splitext(filename)
-            # if file_extension == '.xml' and 'ai' in filename:
-            if filename == '36kr-ai.xml':
+            if file_extension == '.xml':
                 response = requests.get(url)
                 if response.status_code == 200:
-                    xml_content = response.content.decode('utf-8')
-                    try:
-                        root = etree.fromstring(xml_content.encode('utf-8'))
-                        for item in root.xpath('//item', namespaces=namespaces):
-                            title = item.find('title').text
-                            link = item.find('link').text
-                            content = item.find('content:encoded', namespaces=namespaces).text
-                            pub_date = item.find('pubDate').text
-                            pub_date = format_date(pub_date)
-                            content = extract_content_between_divs(content)
-                            article = Article(title=title, link=link, content=content, publication_date=pub_date)
-                            articles.append(article)
-                    except etree.XMLSyntaxError as e:
-                        print(f"Error parsing XML: {e}")
+                    xml_content = response.content
+                    if filename in filenames and platform in filename:
+                        return parse_content(xml_content.decode('utf-8'))
                 else:
                     print(f"Failed to download {filename}: {response.status_code}")
-        return articles
     else:
         print(response.json()['message'])
+
+
+def parse_content(xml_content):
+    namespaces = {
+        'content': 'http://purl.org/rss/1.0/modules/content/',
+    }
+    try:
+        articles = []
+        root = etree.fromstring(xml_content.encode('utf-8'))
+        for item in root.xpath('//item', namespaces=namespaces):
+            title = item.find('title').text
+            link = item.find('link').text
+            content = item.find('content:encoded', namespaces=namespaces).text
+            pub_date = item.find('pubDate').text
+            pub_date = format_date(pub_date)
+            content = extract_content_between_divs(content)
+            article = Article(title=title, link=link, content=content, publication_date=pub_date)
+            articles.append(article)
+        return articles
+    except etree.XMLSyntaxError as e:
+        print(f"Error parsing XML: {e}")
 
 
 def extract_content_between_divs(content):

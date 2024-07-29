@@ -6,12 +6,12 @@ import requests
 from datetime import datetime, timedelta
 import pytz
 
-from datadigger.model.article import Article
+from article import Article
 
 config_file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.ini')
 
 config = configparser.ConfigParser()
-config.read(config_file_path)
+config.read('config.ini')
 
 # 从配置文件获取GitHub API令牌和其他配置
 token = config['GitHub']['TOKEN']

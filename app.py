@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 
-from datadigger.rss.rss_gpt import fetch_xml
+from rss_gpt import fetch_xml
 
 app = Flask(__name__)
 

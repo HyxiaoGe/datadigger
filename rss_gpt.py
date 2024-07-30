@@ -26,7 +26,7 @@ def fetch_xml(platform):
     headers = {'Authorization': f'Bearer {token}'}
     response = requests.get(url=url, headers=headers)
 
-    filenames = ['36kr-ai.xml', 'chaping.xml', 'aliresearch.xml']
+    filenames = ['36kr-ai.xml', 'zaobao-realtime.xml', 'oeeee-sz.xml', 'chlinlearn.xml', 'deeplearning.xml']
 
     if response.status_code == 200:
         files = response.json()
